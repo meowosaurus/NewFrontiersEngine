@@ -9,6 +9,7 @@
 #include <QMenuBar>
 #include <QWidget>
 #include <QAction>
+#include <QDir>
 
 EditorMenu::EditorMenu(QMainWindow *mainWindow)
 {
@@ -39,14 +40,21 @@ NF_ERROR EditorMenu::CreateMenus()
     windowMenu = this->mainWindow->menuBar()->addMenu(QWidget::tr("&Window"));
     if(windowMenu == nullptr)
         return NF_ERROR::error;
+    toolsMenu = this->mainWindow->menuBar()->addMenu(QWidget::tr("&Tools"));
+    if(toolsMenu == nullptr)
+        return NF_ERROR::error;
     helpMenu = this->mainWindow->menuBar()->addMenu(QWidget::tr("&Help"));
     if(helpMenu == nullptr)
         return NF_ERROR::error;
 
+    // File menu
     fileMenu->addAction(newFileAct);
     fileMenu->addAction(openFileAct);
     fileMenu->addAction(saveFileAct);
     fileMenu->addAction(saveFileAsAct);
+
+    // Tools menu
+    toolsMenu->addAction(createDesktopShortcutAct);
 
     return NF_ERROR::ok;
 }
@@ -73,5 +81,23 @@ NF_ERROR EditorMenu::CreateActions()
         return NF_ERROR::error;
     saveFileAsAct->setStatusTip("Save current file as new file..");
 
+    // Action menu
+
+    createDesktopShortcutAct = new QAction(QAction::tr("Create Desktop Shortcut"), this->mainWindow);
+    if(createDesktopShortcutAct == nullptr)
+        return NF_ERROR::error;
+    createDesktopShortcutAct->setStatusTip("Create an engine desktop shortcut");
+    connect(createDesktopShortcutAct, &QAction::triggered, this, &EditorMenu::createDesktopShortcut);
+
     return NF_ERROR::ok;
+}
+
+void EditorMenu::createDesktopShortcut()
+{
+    // ToDo: Check if OS is Linux
+    QString command = QString("printf \"[Desktop Entry]\nName=NewFrontiersEngine\nExec="
+            + QDir::currentPath() + "/NewFrontiersEngine\n"
+            + "Icon=" + QDir::currentPath() + "/../Engine/Images/nfe_icon.jpg\n"
+            + "Type=Application\" >> /home/$USER/.local/share/applications/nfe.desktop");
+    system(command.toStdString().c_str());
 }

@@ -5,6 +5,8 @@
 #ifndef NEWFRONTIERSENGINE_EDITORMENU_H
 #define NEWFRONTIERSENGINE_EDITORMENU_H
 
+#include <QObject>
+
 #include "Editor/General/nf_error.h"
 
 class QMainWindow;
@@ -14,8 +16,10 @@ class QLabel;
 class QMenu;
 class EditorError;
 
-class EditorMenu
+class EditorMenu : public QObject
 {
+Q_OBJECT
+
 public:
     EditorMenu(QMainWindow* mainWindow);
 
@@ -32,6 +36,13 @@ private:
      */
     NF_ERROR CreateActions();
 
+private slots:
+    /**
+     * Button functionality for createDesktopShortcutAct.
+     * Creates a .desktop file in /home/$USER/.local/share/applications/
+     */
+    void createDesktopShortcut();
+
 private:
     QMainWindow *mainWindow;
 
@@ -40,6 +51,7 @@ private:
     QMenu *objectsMenu;
     QMenu *rendererMenu;
     QMenu *buildMenu;
+    QMenu *toolsMenu;
     QMenu *windowMenu;
     QMenu *helpMenu;
 
@@ -47,6 +59,8 @@ private:
     QAction *openFileAct;
     QAction *saveFileAct;
     QAction *saveFileAsAct;
+
+    QAction *createDesktopShortcutAct;
 
     EditorError *err;
 
